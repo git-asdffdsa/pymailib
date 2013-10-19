@@ -12,6 +12,8 @@ accounts = [
     {  #obviously, this must be deleted first
         'address': 'notreal@gmail.com',
         'password': 'testpassword',
+        #for the wizard to validate
+        'short_name': 'GMail',
         'get_protocol_string': 'imap', # or zb pop3
         'get_authentication_string': 'password-cleartext',
         'get_socket_string': 'SSL',

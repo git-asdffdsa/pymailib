@@ -1,22 +1,22 @@
 __author__ = 'asdffdsa'
 
-class pymailliberror(BaseException):
+class pymailiberror(BaseException):
     pass
 
-class settings_not_right(pymailliberror):
+class settings_not_right(pymailiberror):
     pass
 
-class password_not_right(pymailliberror):
+class password_not_right(pymailiberror):
     pass
 
-class settings_not_guessed(pymailliberror):
+class settings_not_guessed(pymailiberror):
     pass
 
-class settings_not_found(pymailliberror):
+class settings_not_found(pymailiberror):
     pass
 
-class server_not_reachable(pymailliberror):
+class server_not_reachable(pymailiberror):
     pass
 
-class login_not_possible(pymailliberror):
+class login_not_possible(pymailiberror):
     pass
