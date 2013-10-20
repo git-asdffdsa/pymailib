@@ -12,8 +12,8 @@ from os import path
 
 GET_PROTOCOLS = ['imap', 'pop3']
 SEND_PROTOCOLS = ['smtp']
-AUTHENTICATIONS = ['password-cleartext']
-SOCKETS = ['SSL', 'STARTTLS']
+AUTHENTICATIONS = ['password-cleartext', 'password-encrypted', 'client-IP-address']
+SOCKETS = ['SSL', 'STARTTLS', 'plain']
 #the location of the local autoconfig files
 LOCAL_AUTOCONFIG_PATH = ''
 
@@ -49,6 +49,8 @@ class Account:
 
     def auto_fill(self, address, password, guess=True):
         """ mailwizard: finds the appropriate settings for you if you give over email account and password
+        uses the same mechanisms thunderbird does, read
+        https://developer.mozilla.org/en-US/docs/Mozilla/Thunderbird/Autoconfiguration
         """
 
         domain = address.split('@')[1]
@@ -56,27 +58,27 @@ class Account:
         if LOCAL_AUTOCONFIG_PATH and not LOCAL_AUTOCONFIG_PATH == '':
             try:
                 f = open(path.join(LOCAL_AUTOCONFIG_PATH, domain), 'r')
-                self.__get_settings_xml__(address, password, f.read())
+                return 1, self.__get_settings_xml__(address, password, f.read())
             except (FileNotFoundError, errors.settings_not_right):
                 pass
-            else:
-                return 1
         #now look for file at autoconfig.domain (providers can store their own autoconfig files
         try:
-            f = urllib.request.urlopen('http://autoconfig.' + domain)
-            self.__get_settings_xml__(address, password, f.read())
+            f = urllib.request.urlopen('http://autoconfig.' + domain +
+                                       '/mail/config-v1.1.xml?emailaddress=' + address)
+            return 2, self.__get_settings_xml__(address, password, f.read())
         except (urllib.error.HTTPError, urllib.error.URLError, errors.settings_not_right):
             pass
-        else:
-            return 2
+        try:
+            f = urllib.request.urlopen('http://' + domain + '/.well-known/autoconfig/mail/config-v1.1.xml')
+            return 2, self.__get_settings_xml__(address, password, f.read())
+        except (urllib.error.HTTPError, urllib.error.URLError, errors.settings_not_right):
+            pass
         #now look for file at the mozilla database
         try:
             f = urllib.request.urlopen('http://autoconfig.thunderbird.net/v1.1/' + domain)
-            self.__get_settings_xml__(address, password, f.read())
+            return 3, self.__get_settings_xml__(address, password, f.read())
         except (urllib.error.HTTPError, errors.settings_not_right):
             pass
-        else:
-            return 3
         if not guess:
             raise errors.settings_not_found()
         #now guess
@@ -85,13 +87,20 @@ class Account:
         except errors.settings_not_guessed:
             #throw exception
             raise errors.settings_not_found()
-        return 4
+        #no todos, no inputfields
+        return 4, [[], []]
 
     def __get_settings_xml__(self, address, password, string):
-        """reads the settings out of an xml file used for mozilla thunderbird"""
+        """reads the settings out of an xml file used for mozilla thunderbird
+        read https://wiki.mozilla.org/Thunderbird:Autoconfiguration:ConfigFileFormat
+        and https://developer.mozilla.org/en-US/docs/Mozilla/Thunderbird/Autoconfiguration/FileFormat/HowTo
+        it does not support:
+        authentication: smtp-after-pop
+        <restriction>
+        """
         xml_tree = etree.fromstring(string)
         if xml_tree.get("version") != "1.1":
-            raise errors.settings_not_right() # support for version 1.0 will be added later
+            raise errors.settings_not_right()  # version 1.0 is not supported
         provider = xml_tree[0]  # the first element is the provider
         shortname = provider.find('displayShortName').text
         #always take the first incoming to come up
@@ -121,18 +130,37 @@ class Account:
         self.short_name = shortname
         self.get_password = password
         self.get_port = int(incoming.find('port').text)
-        self.get_username = Account.__substitute_username__(address, incoming.find('username').text)
+        self.get_username = incoming.find('username').text
         self.get_servername = incoming.find('hostname').text
         self.get_protocol_string = incoming.get('type')
         self.get_authentication_string = incoming.find('authentication').text
         self.get_socket_string = incoming.find('socketType').text
         self.send_password = password
         self.send_port = int(outgoing.find('port').text)
-        self.send_username = Account.__substitute_username__(address, outgoing.find('username').text)
+        self.send_username = outgoing.find('username').text
         self.send_servername = outgoing.find('hostname').text
         self.send_protocol_string = outgoing.get('type')
         self.send_authentication_string = outgoing.find('authentication').text
         self.send_socket_string = outgoing.find('socketType').text
+        self.__substitute__()
+        #make the object to return
+        #the todos
+        todos = []
+        for todo in provider.iter('enable'):
+            newtodo = {}
+            if todo.get('visiturl'):
+                newtodo['visiturl'] = todo.get('visiturl')
+            newtodo['description'] = todo.text
+            todos.append(newtodo)
+        #we need more information from the user
+        inputfields = []
+        for inputfield in provider.iter('userinput'):
+            newinputfield = {}
+            newinputfield['example'] = inputfield.text
+            newinputfield['label'] = inputfield.get('label')
+            newinputfield['key'] = inputfield.get('key')
+            inputfields.append(newinputfield)
+        return [todos, inputfields]
 
     def __guess_settings__(self, address, password, domain):
         """ guesses the appropriate settings and writes them into the instance
@@ -202,7 +230,6 @@ class Account:
         if not had_success:
             raise errors.settings_not_guessed
 
-
     def passwords_verify(self):
         return self.test_password_get() and self.test_password_send()
 
@@ -222,12 +249,25 @@ class Account:
         method = getattr(protocols, "testsettings_" + self.get_protocol_string)
         return method(self)
 
+    def __substitute__(self, dictionary=None):
+        """ substitutes everything
+        """
+        self.send_username = Account.__substitute_string__(self.address, self.send_username, dictionary)
+        self.send_servername = Account.__substitute_string__(self.address, self.send_servername, dictionary)
+        self.get_username = Account.__substitute_string__(self.address, self.get_username, dictionary)
+        self.get_servername = Account.__substitute_string__(self.address, self.get_servername, dictionary)
+
+
     @staticmethod
-    def __substitute_username__(address, string):
+    def __substitute_string__(address, string, dictionary=None):
         """ substitutes strings found in mozilla's xml files
         """
         string = string.replace('%EMAILLOCALPART%', address.split('@')[0])
         string = string.replace('%EMAILADDRESS%', address)
+        string = string.replace('%%EMAILDOMAIN%', address.split('@')[1])
+        if not dictionary is None:
+            for name, value in dictionary.items():
+                string = string.replace(name, value)
         return string
 
     def __setprop__(self, value, indexlist, attribute_name):
@@ -249,7 +289,7 @@ class Account:
                                   lambda self, value: self.__setprop__(value, SOCKETS, 'send_socket'))
     get_protocol_string = property(lambda self: self.__getprop__(GET_PROTOCOLS, 'get_protocol'),
                                    lambda self, value: self.__setprop__(value, GET_PROTOCOLS, 'get_protocol'))
-    get_authentication_string = property(lambda self: self.__getprop__(AUTHENTICATIONS, 'getauthentication'),
+    get_authentication_string = property(lambda self: self.__getprop__(AUTHENTICATIONS, 'get_authentication'),
                                          lambda self, value: self.__setprop__(value,
                                                                                AUTHENTICATIONS, 'get_authentication'))
     get_socket_string = property(lambda self: self.__getprop__(SOCKETS, 'get_socket'),

@@ -170,14 +170,14 @@ def factory_testpassword(connection_function, get):
                 connection.login(account.get_username, account.get_password)
             else:
                 connection.login(account.send_username, account.send_password)
-        except (imaplib.IMAP4.error, smtplib.SMTPAuthenticationError, UnicodeEncodeError,
+        except (imaplib.IMAP4.error, smtplib.SMTPAuthenticationError, UnicodeEncodeError, socket.timeout,
                 smtplib.SMTPServerDisconnected) as a:
             return False
         return True
     return testpassword
 
 
-def returnmailsinet_imap(account, number, folder='inbox', searchterms={}, offset=0,
+def returnmailsinet_imap(account, number, folder='inbox', searchterms=None, offset=0,
                          orderby='date', reverse=False):
     """retrieve emails from an imap server"""
     connection = connect_imap(account)
@@ -189,7 +189,7 @@ def returnmailsinet_imap(account, number, folder='inbox', searchterms={}, offset
     pass
 
 
-def returnmailsinet_pop3(account, number, folder='inbox', starttime=0, endtime=0, searchterms={}, offset=0,
+def returnmailsinet_pop3(account, number, folder='inbox', starttime=0, endtime=0, searchterms=None, offset=0,
                          orderby='date', reverse=False):
     """retrieve emails from a pop3 server"""
     #TODO
