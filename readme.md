@@ -1,7 +1,7 @@
 pymaillib
 =========
 
-A python library for mail handling
+A python library for mail handling, licensed under the gplv3.
 
 What is this library capable of?
 --------------------------------

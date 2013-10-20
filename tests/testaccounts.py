@@ -4,15 +4,16 @@ __author__ = 'asdffdsa'
 #to run the tests completely, you have to fill in valid email accounts
 
 #accounts which should not be tested by the wizard
-accounts_no_wizard = ['no_wizard_check@imagi.com']
+accounts_no_wizard = []
 #accounts which should not be tested by the passwordchecker
-accounts_no_pwcheck = ['no_password_check@please.thanks']
+accounts_no_pwcheck = []
 #zb:
 accounts = [
-    {  #obviously, this must be deleted first
-        'address': 'notreal@gmail.com',
+    #delete or comment out this account, since these settings won't work
+    {
+        'address': 'asdffdsa.test@gmail.com',
         'password': 'testpassword',
-        #for the wizard to validate
+        #for the
         'short_name': 'GMail',
         'get_protocol_string': 'imap', # or zb pop3
         'get_authentication_string': 'password-cleartext',
@@ -26,7 +27,46 @@ accounts = [
         'send_socket_string': 'SSL',
         'send_servername': 'smtp.googlemail.com',
         'send_port': 465,
-        'send_username': 'notreal@gmail.com',
+        'send_username': 'asdffdsa.test@gmail.com',
         'send_password': 'testpassword'
+    },
+    {
+        'address': 'asdffdsa.test@outlook.com',
+        'password': 'test1234',
+        'short_name': 'Hotmail',
+        'get_protocol_string': 'imap', # or zb pop3
+        'get_authentication_string': 'password-cleartext',
+        'get_socket_string': 'SSL',
+        'get_servername': 'imap-mail.outlook.com',
+        'get_port': 993,
+        'get_username': 'asdffdsa.test@outlook.com',
+        'get_password': 'test1234',
+        'send_protocol_string': 'smtp',
+        'send_authentication_string': 'password-cleartext',
+        'send_socket_string': 'STARTTLS',
+        'send_servername': 'smtp-mail.outlook.com',
+        'send_port': 587,
+        'send_username': 'asdffdsa.test@outlook.com',
+        'send_password': 'test1234'
+    },
+    {
+        'address': 'asdf.fdsa.1@gmx.net',
+        'password': '!§$%&/()',
+        'short_name': 'GMX',
+        'get_protocol_string': 'imap', # or zb pop3
+        'get_authentication_string': 'password-cleartext',
+        'get_socket_string': 'SSL',
+        'get_servername': 'imap.gmx.net',
+        'get_port': 993,
+        'get_username': 'asdf.fdsa.1@gmx.net',
+        'get_password': '!§$%&/()',
+        'send_protocol_string': 'smtp',
+        'send_authentication_string': 'password-cleartext',
+        'send_socket_string': 'SSL',
+        'send_servername': 'mail.gmx.net',
+        'send_port': 465,
+        'send_username': 'asdf.fdsa.1@gmx.net',
+        'send_password': '!§$%&/()'
     }
+    #add more accounts for better testing; also add pop3-only accounts
 ]
