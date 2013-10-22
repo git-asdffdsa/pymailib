@@ -1,0 +1,61 @@
+__author__ = 'asdffdsa'
+import sqlite3
+from . import base
+
+
+class SqliteBase(base.DummyBase):
+    def __init__(self, name=':memory:', *args, **kwargs):
+        self.connection = sqlite3.connect(name)
+        self.connection.row_factory = sqlite3.Row
+        self.cursor = self.connection.cursor()
+        self.name = name
+        self.args = args
+        self.kwargs = kwargs
+        base.DummyBase.__init__(self, name)
+
+    def copy(self):
+        return SqliteBase(self.name, self.args, self.kwargs)
+
+    def setup(self):
+        """ creates all the tables necessary
+        """
+        try:
+            self.cursor.execute('select * from accounts')
+        except sqlite3.OperationalError:
+            self.cursor.execute('''create table accounts
+              (id integer primary key, address text, short_name text, send_protocol integer,
+              send_authentication integer, send_socket integer, send_servername text, send_port integer, send_username text,
+              send_password text, get_protocol integer, get_authentication integer, get_socket integer, get_servername text,
+              get_port integer, get_username text, get_password text)''')
+
+    def read_to_account(self, account, db_account):
+        """ takes a row object and fills an account with it
+        """
+        for element in base.ACCOUNT_FIELDS:
+            setattr(account, element, db_account[element])
+        pass
+
+    def search_account(self, address):
+        """ finds an account with the given address and returns a row object
+        """
+        self.cursor.execute('select * from accounts where address=?', (address,))
+        finding = self.cursor.fetchone()
+        return finding
+
+    def save_account(self, account):
+        self.cursor.execute("select * from accounts where id=?", (str(account.id),))
+        fields = []
+        fieldstring1 = ''
+        fieldstring2 = '('
+        for field in base.ACCOUNT_FIELDS:
+            fields.append(str(getattr(account, field)))
+            fieldstring1 += field + '=?,'
+            fieldstring2 += '?,'
+        fieldstring1 = fieldstring1[:-1]
+        fieldstring2 = fieldstring2[:-1] + ')'
+        if self.cursor.fetchone() is None:
+            self.cursor.execute('insert into accounts values ' + fieldstring2, fields)
+        else:
+            fields.append(account.id)
+            self.cursor.execute('update accounts set ' + fieldstring1 + ' where id=?', fields)
+    pass

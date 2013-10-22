@@ -4,11 +4,13 @@ __author__ = 'asdffdsa'
 from lxml import etree
 import urllib.request
 import urllib.error
-import errors
-import protocols
 import threading
 import copy
 from os import path
+
+import errors
+import protocols
+import settings
 
 GET_PROTOCOLS = ['imap', 'pop3']
 SEND_PROTOCOLS = ['smtp']
@@ -90,6 +92,15 @@ class Account:
         #no todos, no inputfields
         return 4, [[], []]
 
+    def read_from_db(self, account):
+        if type(account) is str:
+            settings.database.read_to_account(self, settings.database.search_account(account))
+        else:
+            settings.database.read_to_account(self, account)
+
+    def save_to_db(self):
+        settings.database.save_account(self)
+
     def __get_settings_xml__(self, address, password, string):
         """reads the settings out of an xml file used for mozilla thunderbird
         read https://wiki.mozilla.org/Thunderbird:Autoconfiguration:ConfigFileFormat
@@ -98,7 +109,10 @@ class Account:
         authentication: smtp-after-pop
         <restriction>
         """
-        xml_tree = etree.fromstring(string)
+        try:
+            xml_tree = etree.fromstring(string)
+        except etree.XMLSyntaxError:
+            raise errors.settings_not_right
         if xml_tree.get("version") != "1.1":
             raise errors.settings_not_right()  # version 1.0 is not supported
         provider = xml_tree[0]  # the first element is the provider

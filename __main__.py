@@ -1,4 +1,4 @@
 __author__ = 'asdffdsa'
-from tests import account_tests
+from tests import database_tests
 import unittest
 

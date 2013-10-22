@@ -20,3 +20,6 @@ class server_not_reachable(pymailiberror):
 
 class login_not_possible(pymailiberror):
     pass
+
+class database_doesnt_support(pymailiberror):
+    pass
