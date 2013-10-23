@@ -18,7 +18,19 @@ class DummyBase:
     def save_account(self, account):
         raise errors.database_doesnt_support
 
-    def search_account(self, address):
+    def search_account_by_address(self, address):
+        raise errors.database_doesnt_support
+
+    def search_account_by_id(self, number):
+        raise errors.database_doesnt_support
+
+    def save_folder(self, folder):
+        raise errors.database_doesnt_support
+
+    def read_to_folder(self, folder, db_folder):
+        raise errors.database_doesnt_support
+
+    def search_folder_by_id(self, number):
         raise errors.database_doesnt_support
 
 DATABASES = [

@@ -23,3 +23,6 @@ class login_not_possible(pymailiberror):
 
 class database_doesnt_support(pymailiberror):
     pass
+
+class account_not_found(pymailiberror):
+    pass

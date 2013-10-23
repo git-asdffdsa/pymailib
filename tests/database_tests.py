@@ -20,7 +20,7 @@ class DatabaseTest(unittest.TestCase):
             self.accounts.append(newaccount)
 
     def test_integry(self):
-        """ test wether writing to and reading from a database leaves everything unaltered
+        """ test wether writing to and reading accounts from a database leaves everything unaltered
         """
         oldAccount = None
         for account in self.accounts:
@@ -31,6 +31,9 @@ class DatabaseTest(unittest.TestCase):
             if oldAccount is not None:
                 self.assertFalse(newaccount == oldAccount)
             oldAccount = account
+        #so now all accounts are in the database
+
+
 
     def test_overwriting(self):
         """ test wether overwriting an account (by using the same id) really alters the account
