@@ -26,3 +26,4 @@ class database_doesnt_support(pymailiberror):
 
 class account_not_found(pymailiberror):
     pass
+

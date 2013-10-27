@@ -1,6 +1,7 @@
 __author__ = 'asdffdsa'
 import sqlite3
 from . import base
+import errors
 
 
 class SqliteBase(base.DummyBase):
@@ -36,6 +37,8 @@ class SqliteBase(base.DummyBase):
     def read_to_account(self, account, db_account):
         """ takes a row object and fills an account with it
         """
+        if db_account is None:
+             raise errors.account_not_found
         for element in base.ACCOUNT_FIELDS:
             setattr(account, element, db_account[element])
         pass
@@ -74,7 +77,7 @@ class SqliteBase(base.DummyBase):
     def read_to_folder(self, folder, db_folder):
         folder.id = db_folder['id']
         folder.number = db_folder['number']
-        folder.json = db_folder['json']
+        folder.json = db_folder['folderStructure']
 
     def search_folder_by_id(self, number):
         self.cursor.execute('select * from folders where id=?', (number,))
@@ -86,5 +89,5 @@ class SqliteBase(base.DummyBase):
         if self.cursor.fetchone() is None:
             self.cursor.execute('insert into folders values (?,?,?)', (str(folder.id), str(folder.number), folder.json))
         else:
-            self.cursor.execute('update accounts set id=?, number=?, json=? where id=?',
+            self.cursor.execute('update folders set id=?, number=?, folderStructure=? where id=?',
                                 (str(folder.id), str(folder.number), folder.json, str(folder.id)))

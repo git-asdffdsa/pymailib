@@ -95,7 +95,7 @@ class Account:
     def read_from_db(self, account):
         if type(account) is str:
             settings.database.read_to_account(self, settings.database.search_account_by_address(account))
-        elif type(account) is id:
+        elif type(account) is int:
             settings.database.read_to_account(self, settings.database.search_account_by_id(account))
         else:
             settings.database.read_to_account(self, account)

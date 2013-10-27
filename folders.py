@@ -5,23 +5,36 @@ import json
 import accounts
 import settings
 
+
 class Folder:
     """ holds a virtual folder
-    self.accounts: |account1 :|--folder1
-                   |          |--folder2
-                   |          |--folder3
-                   |
-                   |account2 :|--folder1
-                   |          |--folder2
-                   etc        |--etc
+    self.folders --[id1]--|--account1
+                    |     |
+                    |     |--|-foldername1
+                    |        |-foldername2
+                    |        |-foldername3
+                    |
+                   [id2]--|--account2
+                          |
+                          |--|-foldername1
+                             |-foldername2
+                             |-foldername3
     """
     def __init__(self, account=None, foldername=None, number=0, id=0):
-        self.accounts = {}
         #an integer, frontends can use them for their own purpose
         self.number = number
         self.id = id
+        self.folders = {}
         if account is not None and foldername is not None:
             self.enrich(account, foldername)
+
+    def enrich(self, account, foldername, overwrite=True):
+        if account.id not in self.folders:
+            self.folders[account.id] = [account, []]
+        elif overwrite:
+            self.folders[account.id][0] = account
+        if foldername not in self.folders[account.id][1]:
+            self.folders[account.id][1].append(foldername)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -32,47 +45,36 @@ class Folder:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    def enrich(self, account, foldername):
-        if hasattr(foldername, '__iter__'):
-            #it is iterable
-            for folder in foldername:
-                self.enrich(account, foldername)
-        #a string it is
-        if not account in self.accounts:
-            self.accounts[account] = []
-        self.accounts[account].append(foldername)
-
     def __add__(self, other):
         new_folder = Folder()
-        for account, folders in self.accounts.items():
-            new_folder.enrich(account, folders)
-        for account, folders in other.accounts.items():
-            new_folder.enrich(account, folders)
+        for account_id, folderlist in self.folders.items():
+            for foldername in folderlist[1]:
+                new_folder.enrich(folderlist[0], foldername)
+        for account_id, folderlist in other.folders.items():
+            for foldername in folderlist[1]:
+                new_folder.enrich(folderlist[0], foldername)
         new_folder.id = max(self.id, other.id)
         new_folder.number = max(self.number, other.number)
         return new_folder
 
     def reload_accounts_db_all(self):
-        for account in self.accounts:
-            account.read_from_db(account.id)
+        for account_id, folderlist in self.folders.items():
+            folderlist[0].read_from_db(account_id)
 
     def reload_accounts_db_by_id(self, number):
-        for account in self.accounts:
-            if account.id == number:
-                account.read_from_db(account.id)
+        self.folders[number][0].read_from_db(number)
 
     def substitute_by_account(self, account):
-        found = None
-        for local_account in self.accounts:
-            if local_account.id == account.id:
-                found = local_account
-        if found is None:
-            for local_account in self.accounts:
-                if local_account.address == account.address:
-                    found = local_account
-        if found is None:
+        found_id = None
+        if account.id in self.folders:
+            found_id = account.id
+        if found_id is None:
+            for account_id, folderlist in self.folders:
+                if folderlist[0].address == account.address:
+                    found_id = account_id
+        if found_id is None:
             raise errors.account_not_found
-        found.__dict__ = account.__dict__
+        self.folders[found_id][0] = account
 
     def read_from_db(self, folder):
         if type(folder) is int:
@@ -80,19 +82,25 @@ class Folder:
         else:
             settings.database.read_to_folder(self, folder)
 
+    def save_to_db(self):
+        settings.database.save_folder(self)
+
     def __load_from_json__(self, string):
         structure_from_json = json.loads(string)
-        for accountid, folderlist in structure_from_json:
+        for account_id_string, folderlist in structure_from_json.items():
+            #json decodes dictionary keys to string type; see
+            #http://stackoverflow.com/questions/1450957/pythons-json-module-converts-int-dictionary-keys-to-strings
+            account_id = int(account_id_string)
             newaccount = accounts.Account()
-            newaccount.id = accountid
-            self.accounts[newaccount] = folderlist
+            newaccount.id = account_id
+            self.folders[account_id] = [newaccount, folderlist]
         self.reload_accounts_db_all()
 
     def __generate_json__(self):
-        #will be exactly the same as self.accounts, only that it holds only an id instead of a whole account
+        #will be exactly the same as self.folders, but without the actual accounts
         structure_to_write = {}
-        for account, folderlist in self.accounts:
-            structure_to_write[account.id] = folderlist
+        for account_id, folderlist in self.folders.items():
+            structure_to_write[account_id] = folderlist[1]
         return json.dumps(structure_to_write)
 
     json = property(__generate_json__, __load_from_json__)
