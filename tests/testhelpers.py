@@ -3,6 +3,7 @@ import random
 import string
 import accounts
 import folders
+import mails
 from . import testsettings
 
 
@@ -57,3 +58,37 @@ def make_folderlist_fictional(accountlist):
         recombinations_used.append([first_index, second_index])
         folderlist.append(folderlist[first_index] + folderlist[second_index])
     return folderlist
+
+def make_maillist_fictional(accountlist):
+    maillist = []
+    mail_number = random.randint(testsettings.mails_all_in_all[0], testsettings.mails_all_in_all[1])
+    for i in range(0, mail_number):
+        new_mail = mails.Mail()
+        for argument, value in testsettings.random_mail_field_length.items():
+            # the attributes that are strings
+            new_string = ''
+            string_length = random.randint(value[0], value[1])
+            for u in range(0, string_length):
+                new_string += random.choice(string.printable)
+            setattr(new_mail, argument, new_string)
+        for argument, value in testsettings.random_mail_field_list.items():
+            # the attributes that are lists filled with strings
+            number_of_elements = random.randint(value[0], value[1])
+            new_list = []
+            for u in range(0, number_of_elements):
+                new_string = ''
+                string_length = random.randint(value[2], value[3])
+                for o in range(0, string_length):
+                    new_string += random.choice(string.printable)
+                new_list.append(new_string)
+            setattr(new_mail, argument, new_list)
+        for argument, value in testsettings.random_mail_field_between.items():
+            # the attributes that are simple numbers
+            setattr(new_mail, argument, random.randint(value[0], value[1]))
+        # now set a random account as receiver and as sender
+        #accountlist.append(None)
+        new_mail.receiver_account = random.choice(accountlist)
+        new_mail.sender_account = random.choice(accountlist)
+        new_mail.id = i
+        maillist.append(new_mail)
+    return maillist

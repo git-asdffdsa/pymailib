@@ -7,7 +7,7 @@ from . import testsettings
 import accounts
 import settings
 import folders
-
+import mails
 import random
 import string
 
@@ -17,6 +17,7 @@ class DatabaseTest(unittest.TestCase):
         settings.database.setup()
         self.accounts = testhelpers.make_accountlist(testaccounts.accounts)
         self.folders = testhelpers.make_folderlist_fictional(self.accounts)
+        self.mails = testhelpers.make_maillist_fictional(self.accounts)
 
     def test_integry(self):
         """ test wether writing to and reading accounts and/or folders from a database leaves everything unaltered
@@ -26,9 +27,9 @@ class DatabaseTest(unittest.TestCase):
             account.save_to_db()
             new_account = accounts.Account()
             new_account.read_from_db(account.address)
-            self.assertTrue(new_account == account)
+            self.assertEqual(new_account, account)
             if old_account is not None:
-                self.assertFalse(new_account == old_account)
+                self.assertNotEqual(new_account, old_account)
             old_account = account
         #so now all accounts are in the database
         #now test for the folders
@@ -37,10 +38,19 @@ class DatabaseTest(unittest.TestCase):
             folder.save_to_db()
             new_folder = folders.Folder()
             new_folder.read_from_db(folder.id)
-            self.assertTrue(new_folder == folder)
+            self.assertEqual(new_folder, folder)
             if old_folder is not None:
-                self.assertFalse(new_folder == old_folder)
+                self.assertNotEqual(new_folder, old_folder)
             old_folder = folder
+        old_mail = None
+        for mail in self.mails:
+            mail.save_to_db()
+            new_mail = mails.Mail()
+            new_mail.read_from_db(mail.id)
+            self.assertEqual(new_mail, mail)
+            if old_mail is not None:
+                self.assertNotEqual(new_mail, old_mail)
+            old_mail = mail
 
     def test_overwriting(self):
         """ test wether overwriting an account or folder (by using the same id) really alters the account
@@ -65,4 +75,12 @@ class DatabaseTest(unittest.TestCase):
             newfolder = folders.Folder()
             newfolder.read_from_db(folder.id)
             self.assertEqual(folder, newfolder)
+        #mails
+        for mail in self.mails:
+            mail.save_to_db()
+            mail.receiver = 'THE_CHOSEN_ONE'
+            mail.save_to_db()
+            newmail = mails.Mail()
+            newmail.read_from_db(mail.id)
+            self.assertEqual(mail, newmail)
 

@@ -9,6 +9,7 @@ class FolderTestOffline(unittest.TestCase):
     def setUp(self):
         self.accounts = testhelpers.make_accountlist(testaccounts.accounts)
         self.folders = testhelpers.make_folderlist_fictional(self.accounts)
+
     def test_addition(self):
         """ test wether the normal rules for addition (kommutativ, etc.) are active for accounts
         """
