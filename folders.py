@@ -37,6 +37,12 @@ class Folder:
             self.folders[account.id][1].append(foldername)
 
     def __eq__(self, other):
+        #simply comparing __dict__ does not work, because the foldernames could have a different order
+        #thats why we order them first
+        for account_id, folderlist in self.folders.items():
+            folderlist[1].sort()
+        for account_id, folderlist in other.folders.items():
+            folderlist[1].sort()
         if isinstance(other, self.__class__):
             return self.__dict__ == other.__dict__
         else:

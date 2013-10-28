@@ -2,6 +2,7 @@ __author__ = 'asdffdsa'
 import unittest
 
 from . import testaccounts
+from . import testhelpers
 from . import testsettings
 import accounts
 import settings
@@ -14,28 +15,11 @@ class DatabaseTest(unittest.TestCase):
     def setUp(self):
         settings.set_database('sqlite', ':memory:')
         settings.database.setup()
-        self.accounts = []
-        for account in testaccounts.accounts:
-            newaccount = accounts.Account()
-            for argument, value in account.items():
-                if argument in testsettings.accounts_not_needed:
-                    continue
-                setattr(newaccount, argument, value)
-            self.accounts.append(newaccount)
-        self.folders = []
-        for account in self.accounts:
-            foldername_length = random.choice(range(testsettings.random_foldername_lengths[0],
-                                                    testsettings.random_foldername_lengths[1]))
-            foldername = ''
-            for i in range(foldername_length):
-                foldername += random.choice(string.printable)
-            newfolder = folders.Folder(account, foldername)
-            self.folders.append(newfolder)
-        if len(self.folders) > 1:
-            self.folders.append(self.folders[0] + self.folders[1])
+        self.accounts = testhelpers.make_accountlist(testaccounts.accounts)
+        self.folders = testhelpers.make_folderlist_fictional(self.accounts)
 
     def test_integry(self):
-        """ test wether writing to and reading accounts from a database leaves everything unaltered
+        """ test wether writing to and reading accounts and/or folders from a database leaves everything unaltered
         """
         old_account = None
         for account in self.accounts:
@@ -59,8 +43,9 @@ class DatabaseTest(unittest.TestCase):
             old_folder = folder
 
     def test_overwriting(self):
-        """ test wether overwriting an account (by using the same id) really alters the account
+        """ test wether overwriting an account or folder (by using the same id) really alters the account
         """
+        #accounts
         for account in self.accounts:
             account.save_to_db()
             account.get_servername = 'asdf'
@@ -68,6 +53,16 @@ class DatabaseTest(unittest.TestCase):
             newaccount = accounts.Account()
             newaccount.read_from_db(account.address)
             self.assertEqual(account, newaccount)
+        #folders
+        for folder in self.folders:
+            folder.save_to_db()
+            for account_id, folderlist in folder.folders.items():
+                i = 0
+                for foldername in folderlist[1]:
+                    folderlist[1][i] = foldername + '_test'
+                    i += 1
+            folder.save_to_db()
+            newfolder = folders.Folder()
+            newfolder.read_from_db(folder.id)
+            self.assertEqual(folder, newfolder)
 
-suite = unittest.TestLoader().loadTestsFromTestCase(DatabaseTest)
-unittest.TextTestRunner(verbosity=2).run(suite)

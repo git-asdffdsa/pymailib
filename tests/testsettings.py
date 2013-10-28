@@ -27,5 +27,7 @@ random_password_lengths = [2, 7]
 random_password_times = 1
 
 random_foldername_lengths = [2, 100]
-#how much foldernames per account (between first and second value)
-random_foldername_times = [2, 100]
+#how much foldernames per virtual folder (between first and second value)
+random_foldername_times = [1, 50]
+#how much virtual folders per account
+folders_per_account = [1, 10]

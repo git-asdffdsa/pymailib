@@ -2,22 +2,15 @@ __author__ = 'asdffdsa'
 from . import testaccounts
 import accounts
 from . import testsettings
+from . import testhelpers
 import string
 import random
-#from unittest import TestCase
 import unittest
 
 class MailAccountTest(unittest.TestCase):
     """test the class MailAccount"""
     def setUp(self):
-        self.accounts = []
-        for account in testaccounts.accounts:
-            newaccount = accounts.Account()
-            for argument, value in account.items():
-                if argument in testsettings.accounts_not_needed:
-                    continue
-                setattr(newaccount, argument, value)
-            self.accounts.append(newaccount)
+        self.accounts = testhelpers.make_accountlist(testaccounts.accounts)
 
     def test_mailwizard(self):
         """test the mail wizard to get settings automatically"""
@@ -64,5 +57,3 @@ class MailAccountTest(unittest.TestCase):
                 self.assertFalse(testaccount.test_password_get())
                 self.assertFalse(account.test_password_send())
 
-suite = unittest.TestLoader().loadTestsFromTestCase(MailAccountTest)
-unittest.TextTestRunner(verbosity=2).run(suite)
