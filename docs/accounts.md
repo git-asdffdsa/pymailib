@@ -4,13 +4,15 @@ the Account class
 Methods
 -------
 ###auto_fill(address, password, guess=True)
-Tries to fill the necessary fields by itself, if you provide an email-address and a general password
+Tries to fill the necessary fields by itself, if you provide an email-address and a general password.
+
 The mechanics used are somehow derived from what Mozilla Thunderbird does.
 ####Mechanism list:
 *    looks for a local xml file; located in settings.LOCAL_AUTOCONFIG_PATH (by default /etc/local_files/
 *    looks for a xml file at the domain the email is registered to (e.g. asf@hotmail.com -> hotmail.com)
 *    looks for a xml file at the mozilla database (autoconfig.thunderbird.net/v1.1/)
 *    if *guess* is True, try to guess the settings, simply by trying to connect again and again to different servers
+
 This method does _not_ expect you to deliver the right password, you can reset the password later yourself
 ####Possible outcomes:
 1.   Neighter of these mechanisms worked:
@@ -19,6 +21,7 @@ This method does _not_ expect you to deliver the right password, you can reset t
      Since some providers require different things (e.g. enable smtp), this could be the case... look at
      _return_values_ for further explanation
 3.   Everything worked out of the box
+
 ####Return Values:
 This function returns three values:
 1.   Which mechanism worked.
@@ -39,6 +42,7 @@ This function returns three values:
           The actual name of the field, you need to use this later
      After you asked the user about the input field, you should give the values back to the account with the
      __substitute__ method
+
 If the second two values are empty lists, there is nothing to do
 ###__substitute__(dictionary=None)
 Use this to return the values you asked the user about after using auto_fill
@@ -55,10 +59,12 @@ Which account to use will be decided by what you provide by account; you can pro
      In this case, an account with the id you provided will be searched in the database
 *    Anything else
      In this case, it will be interpreted as a database object and will be passed to the database directly
+
 ####Possible outcomes
 *    The account is filled and everything went good
 *    There was no account with the id/address you provided
      In this case, an errors.account_not_found will be thrown
+     
 ###save_to_db()
 Save the account to the database
 Values
