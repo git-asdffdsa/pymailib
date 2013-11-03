@@ -19,6 +19,7 @@ SOCKETS = ['SSL', 'STARTTLS', 'plain']
 #the location of the local autoconfig files
 LOCAL_AUTOCONFIG_PATH = ''
 
+
 class Account:
 
     def __init__(self):
