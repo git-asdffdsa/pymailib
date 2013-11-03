@@ -74,24 +74,27 @@ DATABASE_STRUCTURE = {
         ['folderStructure', 'text']
     ],
     'mails': [
+        #"real" properties
         ['id', 'int', 'primary'],
         ['server_id', 'int'],
-        ['sender_account_id', 'int'],
-        ['receiver_account_id', 'int'],
-        ['receiver', 'text'],
+        ['__bound_account_is_receiver__', 'boolean'],
         ['sender', 'text'],
         ['time_sent', 'int'],
-        ['full_header', 'text'],
-        ['flags_json', 'string'],
+        ['__full_header__', 'text'],
         ['folder', 'string'],
-        ['seen', 'boolean'],
+        ['size', 'int'],
         ['subject', 'string'],
         ['answer_to', 'int'],
-        ['cc_json', 'string'],
-        ['bcc_json', 'string'],
+        ['seen', 'boolean'],
         ['__content__', 'string'],
         ['__has_content__', 'boolean'],
-        ['size', 'int']
+        #properties with setters and getters
+        ['bound_account_id', 'int'],
+        ['attachments_json', 'string'],
+        ['flags_json', 'string'],
+        ['cc_json', 'string'],
+        ['bcc_json', 'string'],
+        ['receivers_json', 'text'],
     ]
 }
 

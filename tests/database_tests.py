@@ -78,7 +78,7 @@ class DatabaseTest(unittest.TestCase):
         #mails
         for mail in self.mails:
             mail.save_to_db()
-            mail.receiver = 'THE_CHOSEN_ONE'
+            mail.sender = 'THE_CHOSEN_ONE'
             mail.save_to_db()
             newmail = mails.Mail()
             newmail.read_from_db(mail.id)

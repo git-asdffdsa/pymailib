@@ -6,13 +6,15 @@ A python library for mail handling, licensed under the gplv3.
 What is this library capable of?
 --------------------------------
 
-This library is currently capable of
+This library is not finished at all, but it should be capable of
 
-*    Handling Accounts
-    *    Automatically configure Accounts
-    *    Check passwords, etc.
-
-Things it should do in the future include
-
-*    Handling Mails
-    *        Handling Conversations
+*    [x] Handling Accounts
+    *    [x] Automatically configure Accounts
+    *    [x] Check passwords, etc.
+    *    [ ] Retrieving a list of available Folder names
+*    [x] Handling Virtual Folders
+    *    [x] Adding Virtual Folders together
+    *    [ ] Retrieving Mails from them
+*    [x] Handling Mails
+    *    [ ] Sending them
+*    [ ] Handling Conversations

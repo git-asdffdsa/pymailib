@@ -64,14 +64,14 @@ def make_maillist_fictional(accountlist):
     mail_number = random.randint(testsettings.mails_all_in_all[0], testsettings.mails_all_in_all[1])
     for i in range(0, mail_number):
         new_mail = mails.Mail()
-        for argument, value in testsettings.random_mail_field_length.items():
+        for argument, value in testsettings.random_mail_field_strings.items():
             # the attributes that are strings
             new_string = ''
             string_length = random.randint(value[0], value[1])
             for u in range(0, string_length):
                 new_string += random.choice(string.printable)
             setattr(new_mail, argument, new_string)
-        for argument, value in testsettings.random_mail_field_list.items():
+        for argument, value in testsettings.random_mail_field_lists.items():
             # the attributes that are lists filled with strings
             number_of_elements = random.randint(value[0], value[1])
             new_list = []
@@ -82,7 +82,7 @@ def make_maillist_fictional(accountlist):
                     new_string += random.choice(string.printable)
                 new_list.append(new_string)
             setattr(new_mail, argument, new_list)
-        for argument, value in testsettings.random_mail_field_between.items():
+        for argument, value in testsettings.random_mail_field_integers.items():
             # the attributes that are simple numbers
             setattr(new_mail, argument, random.randint(value[0], value[1]))
         # now set a random account as receiver and as sender
