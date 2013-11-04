@@ -1,7 +1,9 @@
 the Account class
 =================
 [Methods](#methods)
+
 [Values](#values)
+
 [Usage Examples](#usage-examples)
 
 
