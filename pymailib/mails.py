@@ -1,11 +1,11 @@
+from pymailib import settings, accounts, protocols
+
 __author__ = 'asdffdsa'
-from email.mime.text import MIMEText
-from email.message import Message
-import settings
-import accounts
-import protocols
 import json
 
+from . import settings
+from . import accounts
+from . import protocols
 
 class Attachment:
     """ a class that can hold any email attachment

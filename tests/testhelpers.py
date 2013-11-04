@@ -1,9 +1,8 @@
+from pymailib import accounts, folders, mails
+
 __author__ = 'asdffdsa'
 import random
 import string
-import accounts
-import folders
-import mails
 from . import testsettings
 
 

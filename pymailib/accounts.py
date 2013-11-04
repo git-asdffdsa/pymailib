@@ -1,3 +1,5 @@
+from pymailib import settings
+
 __author__ = 'asdffdsa'
 
 
@@ -8,9 +10,9 @@ import threading
 import copy
 from os import path
 
-import errors
-import protocols
-import settings
+
+from . import errors
+from . import protocols
 
 GET_PROTOCOLS = ['imap', 'pop3']
 SEND_PROTOCOLS = ['smtp']

@@ -1,6 +1,7 @@
+from pymailib import accounts
+
 __author__ = 'asdffdsa'
 from . import testaccounts
-import accounts
 from . import testsettings
 from . import testhelpers
 import string

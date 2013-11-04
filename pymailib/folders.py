@@ -1,10 +1,10 @@
+from pymailib import settings, accounts, errors
+
 __author__ = 'asdffdsa'
 
-import errors
 import json
-import accounts
-import settings
-
+from . import errors
+from . import accounts
 
 class Folder:
     """ holds a virtual folder

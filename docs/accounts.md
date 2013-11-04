@@ -22,7 +22,9 @@ This method does **not** expect you to deliver the right password, you can reset
 
      Since some providers require different things (e.g. enable smtp), this could be the case... look at
      **return values** for further explanation
-3.   Everything worked out of the box
+3.   Everything worked
+
+     In this case, the second two return values are empty lists
 
 ####Return Values:
 This function returns three values:
@@ -112,3 +114,22 @@ Values
 *    send_socket_string; get_socket_string
 
      The sockets to use (e.g. "STARTTLS", "SSL")
+*    send_port, get_port
+
+     The ports to use
+
+Usage Examples
+--------------
+
+#####a simple program that returns and imap/pop and smtp server for email adresses
+```python
+from pymailib import accounts
+
+new_account = accounts.Account()
+number = new_account.auto_fill(input("Please enter your email Address:\n"), '')
+if number[0] == 4:
+    print("The server had to be guessed!")
+print(number)
+print("Your " + new_account.get_protocol_string + " server is '" + new_account.get_servername + "'.")
+print("Your " + new_account.send_protocol_string + " server is '" + new_account.send_servername + "'.")
+```

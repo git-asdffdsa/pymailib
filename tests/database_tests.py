@@ -1,15 +1,11 @@
+from pymailib import settings, accounts, folders, mails
+
 __author__ = 'asdffdsa'
 import unittest
 
 from . import testaccounts
 from . import testhelpers
-from . import testsettings
-import accounts
-import settings
-import folders
-import mails
-import random
-import string
+
 
 class DatabaseTest(unittest.TestCase):
     def setUp(self):

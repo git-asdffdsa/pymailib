@@ -1,6 +1,8 @@
 __author__ = 'asdffdsa'
-from databases import base
 import importlib
+
+from .databases import base
+
 __DATABASES_AVAILABLE__ = {}
 #the database to use
 database = base.DummyBase('DummyBase')
@@ -21,7 +23,7 @@ def set_database(database_type, name, *args, **kwargs):
     #check whether it is a available database
     if not database_type in __DATABASES_AVAILABLE__:
         raise ValueError
-    new_import = importlib.import_module('databases.' + database_type)
+    new_import = importlib.import_module('.databases.' + database_type, 'pymailib')
     new_class = getattr(new_import, __DATABASES_AVAILABLE__[database_type])
     database = new_class(name, *args, **kwargs)
 

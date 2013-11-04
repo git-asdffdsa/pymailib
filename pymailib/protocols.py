@@ -1,3 +1,5 @@
+from pymailib import errors
+
 __author__ = 'asdffdsa'
 
 """utils to handle the different protocols to send and get emails"""
@@ -7,9 +9,10 @@ import smtplib
 #for the errors
 import socket
 import ssl
-import errors
 import threading
 import copy
+
+from . import errors
 #from pywail.handler import mailAccount
 
 SOCKET_METHODS = [0, 1]
