@@ -8,18 +8,20 @@ Tries to fill the necessary fields by itself, if you provide an email-address an
 
 The mechanics used are somehow derived from what Mozilla Thunderbird does.
 ####Mechanism list:
-*    looks for a local xml file; located in settings.LOCAL_AUTOCONFIG_PATH (by default /etc/local_files/
+*    looks for a local xml file; located in settings.LOCAL_AUTOCONFIG_PATH (by default not set)
 *    looks for a xml file at the domain the email is registered to (e.g. asf@hotmail.com -> hotmail.com)
 *    looks for a xml file at the mozilla database (autoconfig.thunderbird.net/v1.1/)
 *    if *guess* is True, try to guess the settings, simply by trying to connect again and again to different servers
 
-This method does _not_ expect you to deliver the right password, you can reset the password later yourself
+This method does **not** expect you to deliver the right password, you can reset the password later yourself
 ####Possible outcomes:
-1.   Neighter of these mechanisms worked:
+1.   Neither of these mechanisms worked:
+
      In this case, the exception errors.settings_not_found is thrown.
 2.   It worked, but you have to ask the user a question, or he has to do something manually
+
      Since some providers require different things (e.g. enable smtp), this could be the case... look at
-     _return_values_ for further explanation
+     **return values** for further explanation
 3.   Everything worked out of the box
 
 ####Return Values:
@@ -61,7 +63,7 @@ Use this to return the values you asked the user about after using auto_fill
 For the dictionary, provide a dictionary with the form
 
 "key": "value_the_user_gave_you"
-###password_verify
+###password_verify()
 Returns True if the passwords are right, False if they aren't.
 ###read_from_db(account)
 Fill this account with values read from the database.

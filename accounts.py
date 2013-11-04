@@ -58,9 +58,9 @@ class Account:
 
         domain = address.split('@')[1]
         #look for local file
-        if LOCAL_AUTOCONFIG_PATH and not LOCAL_AUTOCONFIG_PATH == '':
+        if settings.LOCAL_AUTOCONFIG_PATH and not settings.LOCAL_AUTOCONFIG_PATH == '':
             try:
-                f = open(path.join(LOCAL_AUTOCONFIG_PATH, domain), 'r')
+                f = open(path.join(settings.LOCAL_AUTOCONFIG_PATH, domain), 'r')
                 return 1, self.__get_settings_xml__(address, password, f.read())
             except (FileNotFoundError, errors.settings_not_right):
                 pass

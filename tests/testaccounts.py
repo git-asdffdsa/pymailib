@@ -11,7 +11,7 @@ accounts_no_pwcheck = ['asdffdsa.test@outlook.com']
 accounts = [
     #delete or comment out this account, since these settings won't work
     {
-        'id': 0,
+        'id': 1,
         'address': 'asdffdsa.test@gmail.com',
         'password': 'testpassword',
         #for the
@@ -32,7 +32,7 @@ accounts = [
         'send_password': 'testpassword'
     },
     {
-        'id': 1,
+        'id': 2,
         'address': 'asdffdsa.test@outlook.com',
         'password': 'test1234',
         'short_name': 'Hotmail',
@@ -52,7 +52,7 @@ accounts = [
         'send_password': 'test1234'
     },
     {
-        'id': 2,
+        'id': 3,
         'address': 'asdf.fdsa.1@gmx.net',
         'password': '!§$%&/()',
         'short_name': 'GMX',
