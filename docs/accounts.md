@@ -1,5 +1,9 @@
 the Account class
 =================
+[Methods](#methods)
+[Values](#values)
+[Usage Examples](#usage-examples)
+
 
 Methods
 -------
@@ -7,14 +11,14 @@ Methods
 Tries to fill the necessary fields by itself, if you provide an email-address and a general password.
 
 The mechanics used are somehow derived from what Mozilla Thunderbird does.
-####Mechanism list:
+#####Mechanism list:
 *    looks for a local xml file; located in settings.LOCAL_AUTOCONFIG_PATH (by default not set)
 *    looks for a xml file at the domain the email is registered to (e.g. asf@hotmail.com -> hotmail.com)
 *    looks for a xml file at the mozilla database (autoconfig.thunderbird.net/v1.1/)
 *    if *guess* is True, try to guess the settings, simply by trying to connect again and again to different servers
 
 This method does **not** expect you to deliver the right password, you can reset the password later yourself
-####Possible outcomes:
+#####Possible outcomes:
 1.   Neither of these mechanisms worked:
 
      In this case, the exception errors.settings_not_found is thrown.
@@ -26,7 +30,7 @@ This method does **not** expect you to deliver the right password, you can reset
 
      In this case, the second two return values are empty lists
 
-####Return Values:
+#####Return Values:
 This function returns three values:
 
 1.    Which mechanism worked.
@@ -80,7 +84,7 @@ Which account to use will be decided by what you provide by account; you can pro
 
      In this case, it will be interpreted as a database object and will be passed to the database directly
 
-####Possible outcomes
+#####Possible outcomes
 *    The account is filled and everything went good
 *    There was no account with the id/address you provided
 
