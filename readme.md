@@ -11,7 +11,7 @@ This library is not finished at all, but later it should be capable of
 *    [x] Handling Accounts
     *    [x] Automatically configure accounts
     *    [x] Check passwords, etc.
-    *    [ ] Retrieving a list of available folder names
+    *    [x] Retrieving a list of available folder names
 *    [x] Handling Virtual Folders
     *    [x] Adding virtual folders together
     *    [ ] Retrieving mails from them

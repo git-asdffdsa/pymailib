@@ -1,5 +1,3 @@
-from pymailib import errors
-
 __author__ = 'asdffdsa'
 
 """utils to handle the different protocols to send and get emails"""
@@ -23,6 +21,7 @@ POP_PORTS = [995, 110]
 IMAP_PREFIXES = ['imap.', 'mail.', 'imap-mail.', '']
 SMTP_PREFIXES = ['smtp.', 'mail.', 'smtp-mail.', '']
 POP_PREFIXES = ['pop.', 'pop3.', 'mail.', 'pop-mail.', 'pop3-mail.', '']
+FOLDER_FUNCTIONS = ['All', 'Drafts', 'Sent', 'Flagged', 'Trash', 'Junk', 'Important']
 
 
 #functions for connection: they connect appropriately and return the connection object; if something goes wrong, they
@@ -104,7 +103,7 @@ def factory_guesssettings_get(ports, sockets, domain_prefixes, authentication_me
                 for port in ports:
                     for domain_prefix in domain_prefixes:
                         #account is mutable, otherwise we would end up with identical accounts
-                        newaccount = copy.deepcopy(account) # every thread needs its own copy to work on
+                        newaccount = copy.deepcopy(account)  # every thread needs its own copy to work on
                         newaccount.get_authentication = authentication_method
                         newaccount.get_socket = sock
                         newaccount.get_port = port
@@ -141,7 +140,7 @@ def factory_guesssettings_send(ports, sockets, domain_prefixes, authentication_m
             for sock in sockets:
                 for port in ports:
                     for domain_prefix in domain_prefixes:
-                        newaccount = copy.deepcopy(account) # every thread needs its own copy to work on
+                        newaccount = copy.deepcopy(account)  # every thread needs its own copy to work on
                         newaccount.send_authentication = authentication_method
                         newaccount.send_socket = sock
                         newaccount.send_port = port
@@ -156,7 +155,7 @@ def factory_guesssettings_send(ports, sockets, domain_prefixes, authentication_m
         #sort the successlist by the number n (the first element of each element)
         successlist = sorted(successlist, key=lambda element: element[0])
         for i in successlist:
-            if i[1]: # if it was successfull
+            if i[1]:  # if it was successfull
                 return i[2]
         raise errors.settings_not_guessed
     return guessfunction
@@ -202,8 +201,75 @@ def returnmailsinet_pop3(account, number, folder='inbox', starttime=0, endtime=0
 def sendmail_smtp(mail):
     """ send mails over smtp
     """
-    #TODO
-    pass
+    pass  # TODO
+
+
+def savemail_imap(mail):
+    """ save mails to an imap server
+    """
+    pass  # TODO
+
+
+def savemail_pop3(mail):
+    """ save mails to a pop server
+    """
+    pass  # since you can't save to a pop server...
+
+
+def getcontent_imap(mail):
+    """ get the contents of a mails from an imap server
+    """
+    pass  # TODO
+
+
+def getcontent_pop3(mail):
+    """ this is not possible
+    """
+    raise NotImplementedError
+
+
+def listfolders_imap(account):
+    connection = connect_imap(account)
+    connection.login(account.get_username, account.get_password)
+    folder_list_strings = connection.list()[1]
+    #example of such a list for gmail in german:
+    #[b'(\\HasNoChildren) "/" "INBOX"', b'(\\Noselect \\HasChildren) "/" "[Gmail]"',
+    # b'(\\HasNoChildren \\All) "/" "[Gmail]/Alle Nachrichten"',
+    # b'(\\HasNoChildren \\Drafts) "/" "[Gmail]/Entw&APw-rfe"', b'(\\HasNoChildren \\Sent) "/" "[Gmail]/Gesendet"',
+    # b'(\\HasNoChildren \\Flagged) "/" "[Gmail]/Markiert"', b'(\\HasNoChildren \\Trash) "/" "[Gmail]/Papierkorb"',
+    # b'(\\HasNoChildren \\Junk) "/" "[Gmail]/Spam"', b'(\\HasNoChildren \\Important) "/" "[Gmail]/Wichtig"'])
+    folder_list = {}
+    #which folder has the junk email, the drafts, etc.
+    folder_functions = {}
+    for element in folder_list_strings:
+        #the elements are strings
+        split_element = element.decode().split('"/"')
+        attributes = split_element[0][1:-2].split(' ')
+        new_attributes = []
+        full_name = split_element[1][2:-1]
+        temporary_folder_list = folder_list
+        #well, the name could be a subdirectory
+        split_name = full_name.split('/')
+        for subfolder in split_name[:-1]:
+            #so bind this folder to the right folder
+            temporary_folder_list = folder_list[subfolder]['subfolders']
+        #now set the name to the last part
+        name = split_name[len(split_name) - 1]
+        temporary_folder_list[name] = {}
+        for attribute in attributes:
+            #there are still the two backslashes in the beginning
+            new_attributes.append(attribute[1:])
+            if attribute[1:] in FOLDER_FUNCTIONS:
+                folder_functions[attribute[1:]] = full_name
+        if 'Noselect' in new_attributes:
+            temporary_folder_list[name]['selectable'] = False
+        else:
+            temporary_folder_list[name]['selectable'] = True
+        temporary_folder_list[name]['subfolders'] = {}
+    return folder_list, folder_functions
+
+
+
 
 
 testsettings_imap = factory_testsettings(connect_imap)
@@ -215,6 +281,7 @@ testpassword_imap = factory_testpassword(connect_imap, True)
 guesssettings_imap = factory_guesssettings_get(IMAP_PORTS, SOCKET_METHODS, IMAP_PREFIXES, AUTHENTICATION_METHODS)
 guesssettings_pop3 = factory_guesssettings_get(POP_PORTS, SOCKET_METHODS, POP_PREFIXES, AUTHENTICATION_METHODS)
 guesssettings_smtp = factory_guesssettings_send(SMTP_PORTS, SOCKET_METHODS, SMTP_PREFIXES, AUTHENTICATION_METHODS)
+
 
 def testpassword_pop(account):
     connection = connect_pop(account)

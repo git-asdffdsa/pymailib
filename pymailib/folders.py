@@ -6,6 +6,7 @@ import json
 from . import errors
 from . import accounts
 
+
 class Folder:
     """ holds a virtual folder
     self.folders --[id1]--|--account1
@@ -108,5 +109,17 @@ class Folder:
         for account_id, folderlist in self.folders.items():
             structure_to_write[account_id] = folderlist[1]
         return json.dumps(structure_to_write)
+
+    def getmails(self, number=100, order_by='date', ordering='descending', offset=0, flags_only=None, filtering=None):
+        mails, number = self.getmails_database(number, order_by, ordering, offset, flags_only, filtering)
+
+
+    def getmails_database(self, number=100, order_by='date', ordering='descending', offset=0, flags_only=None,
+                          filtering=None):
+        pass  # TODO
+
+    def getmails_remote(self, number=100, order_by='date', ordering='descending', offset=0, flags_only=None,
+                        filtering=None):
+        pass  # TODO
 
     json = property(__generate_json__, __load_from_json__)

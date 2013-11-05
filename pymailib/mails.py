@@ -84,7 +84,10 @@ class Mail():
         if self.__has_content__:
             return self.__content__
         else:
-            raise NotImplementedError  # TODO
+            content_function = getattr(protocols, 'getcontent_' + self.__bound_account__.get_protocol_string)
+            content = content_function(self)
+            self.__content__ = content
+            self.__has_content__ = True
 
     def __save_content__(self, text):
         self.__content__ = text
@@ -108,7 +111,9 @@ class Mail():
             settings.database.read_to_mail(self, mail)
 
     def save_to_server(self):
-        pass  # TODO
+        #the get protocol, because we don't want to send, but to save the mail
+        save_function = getattr(protocols, 'savemail_' + self.__bound_account__.get_protocol_string)
+        save_function(self)
 
     def __get_bound_account_id__(self):
         """ returns the id of the bound account, zero if there is none

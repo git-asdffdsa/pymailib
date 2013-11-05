@@ -139,3 +139,20 @@ print(number)
 print("Your " + new_account.get_protocol_string + " server is '" + new_account.get_servername + "'.")
 print("Your " + new_account.send_protocol_string + " server is '" + new_account.send_servername + "'.")
 ```
+#####another simple program that returns all the folders available (currently only works for imap)
+```python
+from pymailib import accounts
+
+def print_folder(prefix, folderdict):
+    for foldername, attributes in folderdict.items():
+        print(prefix + foldername)
+        print_folder('  ' + prefix, attributes['subfolders'])
+
+new_account = accounts.Account()
+new_account.auto_fill(input("Please enter your email Address:\n"), input("Please enter your password:\n"))
+folder_list = new_account.list_folders()
+print_folder('|--- ', folder_list[0])
+print("special folders are:")
+for specialname, foldername in folder_list[1].items():
+    print(specialname + '\t - ' + foldername)
+```

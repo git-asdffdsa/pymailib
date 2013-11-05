@@ -276,6 +276,9 @@ class Account:
         self.get_username = Account.__substitute_string__(self.address, self.get_username, dictionary)
         self.get_servername = Account.__substitute_string__(self.address, self.get_servername, dictionary)
 
+    def list_folders(self):
+        list_function = getattr(protocols, 'listfolders_' + self.get_protocol_string)
+        return list_function(self)
 
     @staticmethod
     def __substitute_string__(address, string, dictionary=None):
